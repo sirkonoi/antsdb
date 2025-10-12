@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Integer, String, Text, JSON, DateTime, ForeignKey, Boolean
 from sqlalchemy.orm import relationship
 from .database import Base
-from datetime import datetime
+from datetime import datetime, timezone
 
 class Species(Base):
     __tablename__ = "species"
@@ -16,8 +16,8 @@ class Species(Base):
     order = Column(String, default="Hymenoptera")
 
     status = Column(String, default="draft")  # draft, pending, approved
-    created_at = Column(DateTime, default=datetime)
-    updated_at = Column(DateTime, default=datetime, onupdate=datetime)
+    created_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
+    updated_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
 
     revisions = relationship("SpeciesRevision", back_populates="species", cascade="all, delete-orphan")
     contributors = relationship("Contributors", back_populates="species", cascade="all, delete-orphan")
@@ -28,7 +28,8 @@ class SpeciesRevision(Base):
     id = Column(Integer, primary_key=True, index=True)
     species_id = Column(Integer, ForeignKey("species.id"), nullable=False)
     author_id = Column(Integer, ForeignKey("users.id"), nullable=False)
-    created_at = Column(DateTime, default=datetime)
+    created_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
+
     approved = Column(Boolean, default=False)  # deve essere approvata da un moderatore!!
 
     content = Column(JSON, nullable=False)
@@ -44,7 +45,7 @@ class Users(Base):
     email = Column(String, unique=True, index=True, nullable=False)
     password = Column(String, nullable=False)
     role = Column(String, default="user")
-    joined = Column(DateTime, default=datetime)
+    joined = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
 
     revisions = relationship("SpeciesRevision", back_populates="author", cascade="all, delete-orphan")
     contributions = relationship("Contributors", back_populates="user", cascade="all, delete-orphan")
