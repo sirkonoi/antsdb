@@ -1,3 +1,3 @@
 # AntsDB API
 
-AntsDB is a FastAPI project for managing information about ant species.
+Fast, simple API for antsdb.org, a wiki-style database for ants.
