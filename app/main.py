@@ -7,6 +7,8 @@ models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
+# GET requests
+
 @app.get("/")
 def root():
     return {"message": "Welcome to AntsDB API!"}
@@ -40,6 +42,24 @@ def get_species(species_id: int, db: Session = Depends(get_db)):
         "scientific_name": species.scientific_name,
         "current_content": content
     }
+
+@app.get("/species/{species_id}/revisions")
+def get_specie_revision(species_id: int, db: Session = Depends(get_db)):
+    revisions = (db.query(models.SpeciesRevision).filter(models.SpeciesRevision.species_id == species_id).all())
+    if not revisions:
+        raise HTTPException(status_code=404, detail="No revisions found.")    
+
+    result = []
+    for r in revisions:
+        result.append({
+            "author_id": r.author_id,
+            "created_at": r.created_at,
+            "approved": r.approved,
+            "content": r.content
+        })   
+    return result    
+       
+# POST requests
 
 @app.post("/species")
 def create_species(specie: schemas.SpeciesCreate, db: Session = Depends(get_db)):
