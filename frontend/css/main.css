@@ -1,14 +1,83 @@
 @import url('https://fonts.googleapis.com/css2?family=Bitter:ital,wght@0,100..900;1,100..900&family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap');
 
 body {
-    font-family: "Bitter";    
+    font-family: "Bitter";  
+   -moz-user-select: none;
+   -khtml-user-select: none;
+   -webkit-user-select: none;
+   -ms-user-select: none;
+   user-select: none;      
 }
 
 .main-content {
+    padding-top: 15vh;
     align-items: center;
     align-content: center;
+    line-height: 20px   
 }
 .main-title {
-    color: #00ABE7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;          
+  color: #00ABE7;
+  font-size: 10vh;
+  text-align: center;
+}
+
+.logo {
+  height: 10vh;           
+  width: auto;        
+}
+
+.sub-title {
+    color:black;
     text-align: center;
+    font-size: 2vh
+}
+
+.search {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 4vh auto 0 auto;
+  width: 40vh;
+}
+
+.searchTerm {
+  flex: 1;
+  border: 2px solid #00ABE7;
+  border-right: none;
+  padding: 10px 12px;
+  border-radius: 5px 0 0 5px;
+  outline: none;
+  color: #333;
+  font-size: 2vh;
+}
+
+.searchTerm::placeholder {
+  color: #333;
+}
+
+.searchTerm:focus {
+  color: #00ABE7;
+}
+
+.searchButton {
+  width: 45px;
+  height: 44px;
+  border: 2px solid #00ABE7;
+  background: #00ABE7;
+  color: #fff;
+  border-radius: 0 5px 5px 0;
+  cursor: pointer;
+  font-size: 2vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: background 0.2s ease;
+}
+
+.searchButton:hover {
+  background: #008cc0;
 }
