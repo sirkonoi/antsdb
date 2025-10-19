@@ -98,11 +98,10 @@ def create_revision(species_id: int, revision: schemas.SpeciesRevisionCreate, db
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-# DELETE requests
 # DELETE specie
-@app.delete("species/delete/{species_id}")
-def delete_specie(species_id: int, db: Session = Depends(get_db)):
-    specie = db.query(models.Species).filter(species_id == models.Species.id).first()
+@app.delete("/species/delete/{species_id}")
+def delete_species(species_id: int, db: Session = Depends(get_db)):
+    specie = db.query(models.Species).filter(models.Species.id == species_id).first()
 
     if not specie:
         raise HTTPException(status_code=404, detail="Species not found")
@@ -112,42 +111,56 @@ def delete_specie(species_id: int, db: Session = Depends(get_db)):
 
     return {"message": f"Species {species_id} deleted successfully"}
 
+
 # DELETE revision
-@app.delete("species/{species_id}/revision/del")
-def delete_specie(revision_id: int, db: Session = Depends(get_db)):
-    revision = db.query(models.SpeciesRevision).filter(revision_id == models.SpeciesRevision.id).first()
+@app.delete("/species/{species_id}/revision/{revision_id}/delete")
+def delete_revision(species_id: int, revision_id: int, db: Session = Depends(get_db)):
+    revision = db.query(models.SpeciesRevision).filter(
+        models.SpeciesRevision.species_id == species_id,
+        models.SpeciesRevision.id == revision_id
+    ).first()
 
     if not revision:
-        raise HTTPException(status_code=404, detail="Species not found")
+        raise HTTPException(status_code=404, detail="Revision not found")
     
     db.delete(revision)
     db.commit()
 
-    return {"message": f"Species Revision {revision} deleted successfully"}
+    return {"message": f"Revision {revision_id} deleted successfully"}
 
-#PUT requests
-#PUT specie --> update specie
-@app.put("species/{species_id}/update")
+
+# PUT specie
+@app.put("/species/{species_id}/update")
 def update_species(species_id: int, species: schemas.SpeciesCreate, db: Session = Depends(get_db)):
     specie = db.query(models.Species).filter(models.Species.id == species_id).first()
 
     if not specie:
         raise HTTPException(status_code=404, detail="Species not found")
 
-    specie.update(species.model_dump())
+    for key, value in species.model_dump().items():
+        setattr(specie, key, value)
+
     db.commit()
+    db.refresh(specie)
 
     return {"message": "Species updated successfully", "id": species_id}
 
-#PUT revision --> update revision
-@app.put("species/{species_id}/{revision_id}update")
-def update_species(species_id: int, revision_id: int, species: schemas.SpeciesCreate, db: Session = Depends(get_db)):
-    revision = db.query(models.Species).filter(models.SpeciesRevision.species_id == species_id).filter(models.SpeciesRevision.id == revision_id).first()
 
-    if not revision:
-        raise HTTPException(status_code=404, detail="Species/Revision not found")
+# PUT revisione
+@app.put("/species/{species_id}/revision/{revision_id}/update")
+def update_revision(species_id: int, revision_id: int, revision: schemas.SpeciesRevisionCreate, db: Session = Depends(get_db)):
+    rev = db.query(models.SpeciesRevision).filter(
+        models.SpeciesRevision.species_id == species_id,
+        models.SpeciesRevision.id == revision_id
+    ).first()
 
-    revision.update(species.model_dump())
+    if not rev:
+        raise HTTPException(status_code=404, detail="Revision not found")
+
+    for key, value in revision.model_dump().items():
+        setattr(rev, key, value)
+
     db.commit()
+    db.refresh(rev)
 
-    return {"message": "Revision updated successfully", "id": species_id}
+    return {"message": "Revision updated successfully", "id": revision_id}
